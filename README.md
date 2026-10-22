@@ -1,10 +1,11 @@
-# Sur
+# Nada Sangamam
 
 Free, in-browser riyaz practice for Hindustani and Carnatic singers, with accounts, saved progress and teacher tools.
 
 - **Students:** hear a line against a synthesised tanpura and tabla / tala, sing it back, see which swaras were in tune, low, high or missed, drill the slips, find a comfortable Sa, save progress, join a teacher's class.
 - **Teachers:** create classes (6-character join code), assign lines, see each student's best score. A teacher sees a student's attempts **only on lines assigned to a class they share**.
-- **Guests** can practise without an account; nothing is saved.
+- **Daily lessons** (Carnatic, Days 1–3 so far): a short illustrated card each day with a *Try it* button into the practice player. Signed-in students can mark a day done and heart it; this is private to them (teachers cannot see it).
+- **Guests** can practise and read the daily lessons without an account; nothing is saved.
 
 Stack: Next.js 15 (App Router, TypeScript), Supabase (Auth, Postgres, row-level security), Web Audio in the browser. No audio leaves the device: pitch is analysed locally and only per-swara results are stored.
 
@@ -21,7 +22,7 @@ Without Supabase variables the app still runs: guest practice works, account pag
 ## Set up Supabase
 
 1. Create a project at supabase.com.
-2. Run `supabase/migrations/0001_init.sql`, then `0002_seed_lessons.sql` (SQL editor, or `supabase db push`).
+2. Run `supabase/migrations/0001_init.sql`, `0002_seed_lessons.sql`, then `0003_daily_course.sql` (SQL editor, or `supabase db push`).
 3. Authentication → URL configuration: set the Site URL to your deployed URL and add `http://localhost:3000/auth/callback` and `https://YOUR-DOMAIN/auth/callback` as redirect URLs.
 4. Authentication → Providers → Email: leave "Confirm email" on for production.
 5. Put the project URL and anon / publishable key in `.env.local` and in your host's environment variables.
@@ -48,11 +49,14 @@ PGPORT=5544 PGHOST=/tmp PGUSER=postgres npm run test:db   # access rules, on a t
 | `lib/audio.ts` | Web Audio synthesis: tanpura, harmonium, violin, tabla, tala keeper |
 | `components/Player.tsx` | The practice player |
 | `components/SaFinder.tsx` | Find my Sa |
+| `lib/daily.ts`, `components/DayCard.tsx`, `app/learn/` | Daily lessons: content, card renderer, pages |
+| `lib/brand.ts` | Product name and tagline (one place to change them) |
 | `app/` | Pages and server actions (`actions.ts`) |
 | `supabase/migrations/` | Schema, row-level security, sample lessons |
 
 ## Known limits
 
+- Daily-lesson illustrations are SVG approximations; swap in real artwork in `components/art.tsx` when you have it. Daily lines use the Shankarabharanam scale.
 - Scoring is pitch only, octave-folded, in tune within ±30 cents. Timing, gamaka and meend are not scored.
 - Sounds are synthesised. Recorded instruments are a later step.
 - Lesson content is a small sample and **needs teacher review** before real students rely on it. Rupaka tala follows one published source and is unconfirmed.

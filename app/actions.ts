@@ -102,3 +102,32 @@ export async function leaveClass(form: FormData) {
   revalidatePath('/classes');
   redirect('/classes');
 }
+
+export async function toggleHeart(form: FormData) {
+  const day = Number(form.get('day'));
+  if (!Number.isInteger(day) || day < 1 || day > 365) return;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect(`/login?next=/learn/${day}`);
+  const { data: cur } = await supabase.from('daily_progress').select('hearted')
+    .eq('user_id', user.id).eq('course', 'carnatic-foundations').eq('day', day).maybeSingle();
+  const { error } = await supabase.from('daily_progress')
+    .upsert({ user_id: user.id, course: 'carnatic-foundations', day, hearted: !cur?.hearted }, { onConflict: 'user_id,course,day' });
+  if (error) bounce(`/learn/${day}`, error.message);
+  revalidatePath(`/learn/${day}`); revalidatePath('/learn');
+  redirect(`/learn/${day}`);
+}
+
+export async function setDayDone(form: FormData) {
+  const day = Number(form.get('day'));
+  const done = form.get('done') === '1';
+  if (!Number.isInteger(day) || day < 1 || day > 365) return;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect(`/login?next=/learn/${day}`);
+  const { error } = await supabase.from('daily_progress')
+    .upsert({ user_id: user.id, course: 'carnatic-foundations', day, completed_at: done ? new Date().toISOString() : null }, { onConflict: 'user_id,course,day' });
+  if (error) bounce(`/learn/${day}`, error.message);
+  revalidatePath(`/learn/${day}`); revalidatePath('/learn');
+  redirect(done && day < 365 ? `/learn?done=${day}` : `/learn/${day}`);
+}

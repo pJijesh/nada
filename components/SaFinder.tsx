@@ -99,7 +99,7 @@ export default function SaFinder({ audio, disabled, onBusy, onUse }: {
 
   const busy = disabled || running;
   return (
-    <section className="card" aria-labelledby="saFindTitle">
+    <section className="card" id="find-sa" aria-labelledby="saFindTitle">
       <h3 id="saFindTitle">Find my Sa</h3>
       <p className="sub" style={{ margin: '0 0 12px' }}>
         Sing from your lowest comfortable note up to your highest, with a slide in between.
