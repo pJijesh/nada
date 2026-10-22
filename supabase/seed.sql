@@ -11,3 +11,12 @@ insert into public.lessons (id, tradition, grp, name, notes, scale, sort_order) 
 on conflict (id) do update set
   tradition = excluded.tradition, grp = excluded.grp, name = excluded.name,
   notes = excluded.notes, scale = excluded.scale, sort_order = excluded.sort_order;
+
+-- Daily course lines (also in migrations/0003_daily_course.sql)
+insert into public.lessons (id, tradition, grp, name, notes, scale, sort_order) values
+  ('c-day1-swaras',  'carnatic', 'Daily course', 'Day 1 · The seven swaras',  'S R G M P D N S+ S+ N D P M G R S', 'Shankarabharanam', 100),
+  ('c-day2-sapasa',  'carnatic', 'Daily course', 'Day 2 · Sa, Pa, Sa',        'S P S', 'Shankarabharanam', 110),
+  ('c-day3-mohanam', 'carnatic', 'Daily course', 'Day 3 · Mohanam',           'S R G P D S+ D P G R S', 'Shankarabharanam', 120)
+on conflict (id) do update set
+  tradition = excluded.tradition, grp = excluded.grp, name = excluded.name,
+  notes = excluded.notes, scale = excluded.scale, sort_order = excluded.sort_order;

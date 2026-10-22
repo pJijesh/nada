@@ -10,7 +10,7 @@ do $$ begin
   assert (select count(*) from public.profiles) = 4, 'trigger creates 4 profiles';
   assert (select role from public.profiles where id='00000000-0000-0000-0000-0000000000b2') = 'student', 'unknown role falls back to student';
   assert (select display_name from public.profiles where id='00000000-0000-0000-0000-0000000000a2') = 't2', 'display name falls back to email prefix';
-  assert (select count(*) from public.lessons) = 8, 'seed lessons';
+  assert (select count(*) from public.lessons) = 11, 'seed lessons';
 end $$;
 
 -- As teacher 1: create a class, assign a lesson
@@ -110,7 +110,7 @@ end $$;
 -- Anonymous visitors read lessons but nothing else
 reset role; set role anon; set request.jwt.claim.sub = '';
 do $$ begin
-  assert (select count(*) from public.lessons) = 8, 'anon reads lessons';
+  assert (select count(*) from public.lessons) = 11, 'anon reads lessons';
   begin perform count(*) from public.attempts; raise exception 'anon read attempts';
   exception when insufficient_privilege then null; end;
 end $$;
@@ -121,5 +121,24 @@ delete from public.class_members;
 set request.jwt.claim.sub = '00000000-0000-0000-0000-0000000000a1';
 do $$ begin
   assert (select count(*) from public.attempts) = 0, 'after leaving, teacher sees no attempts';
+end $$;
+
+-- Daily progress: own rows only
+reset role; set role authenticated; set request.jwt.claim.sub = '00000000-0000-0000-0000-0000000000b1';
+insert into public.daily_progress (day, completed_at, hearted) values (1, now(), true);
+update public.daily_progress set hearted = false where day = 1;
+do $$ declare blocked boolean := false; begin
+  assert (select count(*) from public.daily_progress) = 1, 'student sees own daily row';
+  begin
+    insert into public.daily_progress (user_id, day) values ('00000000-0000-0000-0000-0000000000b2', 2);
+  exception when insufficient_privilege then blocked := true; end;
+  assert blocked, 'cannot write another user''s daily progress';
+end $$;
+set request.jwt.claim.sub = '00000000-0000-0000-0000-0000000000a1';
+do $$ begin assert (select count(*) from public.daily_progress) = 0, 'teacher cannot see daily progress'; end $$;
+reset role; set role anon; set request.jwt.claim.sub = '';
+do $$ begin
+  begin perform count(*) from public.daily_progress; raise exception 'anon read daily';
+  exception when insufficient_privilege then null; end;
 end $$;
 \echo SCHEMA TESTS PASSED

@@ -10,4 +10,7 @@ export const FALLBACK_LESSONS: Lesson[] = [
   { id: 'c-sarali1', tradition: 'carnatic', grp: 'Varisai', name: 'Sarali varisai 1', notes: 'S R G M P D N S+ S+ N D P M G R S', scale: null },
   { id: 'c-janta', tradition: 'carnatic', grp: 'Varisai', name: 'Janta varisai', notes: 'S S R R G G M M P P D D N N S+ S+', scale: null },
   { id: 'c-datu', tradition: 'carnatic', grp: 'Varisai', name: 'Datu varisai', notes: 'S G R M G P M D P N D S+', scale: null },
+  { id: 'c-day1-swaras', tradition: 'carnatic', grp: 'Daily course', name: 'Day 1 · The seven swaras', notes: 'S R G M P D N S+ S+ N D P M G R S', scale: 'Shankarabharanam' },
+  { id: 'c-day2-sapasa', tradition: 'carnatic', grp: 'Daily course', name: 'Day 2 · Sa, Pa, Sa', notes: 'S P S', scale: 'Shankarabharanam' },
+  { id: 'c-day3-mohanam', tradition: 'carnatic', grp: 'Daily course', name: 'Day 3 · Mohanam', notes: 'S R G P D S+ D P G R S', scale: 'Shankarabharanam' },
 ];
